@@ -1,0 +1,32 @@
+services:
+  homebridge:
+    image: homebridge/homebridge:latest
+    container_name: homebridge
+    restart: always
+    network_mode: host
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1"
+    volumes:
+      - ./config:/homebridge
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "1"
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - HOMEBRIDGE_CONFIG_UI=1
+      - TZ=$TZ
+      #- HOMEBRIDGE_CONFIG_UI_PORT=8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 2m
+    #labels:
+      #- autoheal=true

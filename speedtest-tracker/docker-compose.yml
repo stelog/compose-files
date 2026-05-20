@@ -1,0 +1,33 @@
+services:
+  # https://docs.linuxserver.io/images/docker-speedtest-tracker/
+  speedtest-tracker:
+    image: lscr.io/linuxserver/speedtest-tracker:latest
+    container_name: speedtest-tracker
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+          cpus: "1"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=$TZ
+      - APP_KEY=${SP_APP_KEY}
+      - APP_URL=${SP_APP_URL}
+      - DB_CONNECTION=sqlite
+      - SPEEDTEST_SCHEDULE="8 * * * *"
+      #- SPEEDTEST_SERVERS=23610,61387,64302,53619
+      - SPEEDTEST_SERVERS=
+      - SPEEDTEST_BLOCKED_SERVERS=53128,64302,60440
+      - DB_HOST= #optional
+      - DB_PORT= #optional
+      - DB_DATABASE= #optional
+      - DB_USERNAME= #optional
+      - DB_PASSWORD= #optional
+      - DISPLAY_TIMEZONE=$TZ #optional
+      - PRUNE_RESULTS_OLDER_THAN=10 #optional
+    volumes:
+      - ./config:/config
+    ports:
+      - 8090:80
+    restart: unless-stopped

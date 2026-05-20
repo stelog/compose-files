@@ -1,0 +1,27 @@
+services:
+  diun:
+    image: crazymax/diun:latest
+    container_name: diun
+    command: serve
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1"
+    volumes:
+      - "./data:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./diun.yml:/diun.yml:ro"
+    environment:
+      - TZ=$TZ
+      - "LOG_LEVEL=info"
+      - "LOG_JSON=false"
+      - "DIUN_WATCH_WORKERS=20"
+      - "DIUN_WATCH_SCHEDULE=0 0 5 * * *"
+      - "DIUN_PROVIDERS_DOCKER=true"
+      - "DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=true"
+      - "CONFIG=/diun.yml"
+    labels:
+      - "diun.enable=true"
+    network_mode: host
+    restart: unless-stopped

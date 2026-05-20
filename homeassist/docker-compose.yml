@@ -1,0 +1,68 @@
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:latest"
+    deploy:
+      resources:
+        limits:
+          memory: 4096M
+          cpus: "2"
+    environment:
+      - TZ=$TZ
+      - DECONZ_BAUDRATE=115200
+      - DEBUG_INFO=1
+      - DEBUG_APS=0
+      - DEBUG_ZCL=0
+      - DEBUG_ZDP=0
+      - DEBUG_OTA=0
+      - DECONZ_DEVICE=/dev/ttyUSB0
+    #ports:
+      #- 8123:8123
+    volumes:
+      - ./config:/config
+      - /etc/localtime:/etc/localtime:ro
+      # Needed for Bluetooth
+      - /run/dbus:/run/dbus:ro
+    devices:
+      # Conbee 3
+      - /dev/serial/by-id/usb-dresden_elektronik_ConBee_III_DE03187597-if00-port0:/dev/ttyUsb0
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost"]
+#      interval: 1m30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 2m
+#    labels:
+#      - autoheal=true
+
+  matter-server:
+    container_name: matter-server
+    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+          cpus: "1"
+    environment:
+      - TZ=$TZ
+    restart: unless-stopped
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - ./matter-server:/data
+      - /run/dbus:/run/dbus:ro
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - homeassistant
+    network_mode: host
+    #healthcheck:
+      #test: ["CMD", "curl", "-f", "http://localhost"]
+      #interval: 1m30s
+      #timeout: 10s
+      #retries: 3
+      #start_period: 2m
+ #   labels:
+ #     - autoheal=true

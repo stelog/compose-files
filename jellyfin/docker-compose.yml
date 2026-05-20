@@ -1,0 +1,40 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    deploy:
+      resources:
+        limits:
+          memory: 4096M
+          cpus: 3
+    user: 1000:1000
+    group_add:
+      - "993"   # This is the value of the render group. Can chanhe with every new install: getent group render | cut -d: -f3
+    environment:
+      - TZ=$TZ
+    network_mode: 'host'
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - $MOVIES:/media/movies
+      - $SHOWS:/media/shows
+      - $DOCUMENTARIES:/media/docus
+      - $ANIME:/media/anime
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128 # renderD128 is the device in group render
+    labels:
+      autoheal: true
+    healthcheck:
+      test: curl -fSs http://127.0.0.1:8096 || exit 1
+      start_period: 90s
+      timeout: 10s
+      interval: 5s
+      retries: 3
+    restart: 'unless-stopped'
+
+    # Optional - alternative address used for autodiscovery
+    #environment:
+    #  - JELLYFIN_PublishedServerUrl=demeter.fritz.box
+    # Optional - may be necessary for docker healthcheck to pass if running in host network mode
+    #extra_hosts:
+    #  - "host.docker.internal:host-gateway"

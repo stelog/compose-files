@@ -1,0 +1,23 @@
+services:
+  smokeping:
+    image: lscr.io/linuxserver/smokeping:latest
+    container_name: smokeping
+    hostname: smokeping #optional
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=$TZ
+      #- MASTER_URL=<URL> #optional
+      #- SHARED_SECRET=password #optional
+      - CACHE_DIR=/tmp #optional
+    volumes:
+      - ./config:/config
+      - ./data:/data
+    ports:
+      - 8091:80
+    restart: unless-stopped

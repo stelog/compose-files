@@ -1,0 +1,9 @@
+[dns]
+  upstreams = [
+    "ipv4 address router",
+    "ipv64 address router"
+  ] ### CHANGED, default = []
+
+  revServers = [
+    "true,<local network>/24,<ipv4 router>,fritz.box"
+  ] ### CHANGED, default = []
